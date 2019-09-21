@@ -53,12 +53,14 @@ parser.add_argument('--embedding_dropout', type=float, default=0.5)
 parser.add_argument('--learning_rate', type=float, default=0.001)
 parser.add_argument('--label_size', type=int, default=1)
 
+parser.add_argument('--load_from_checkpoint', type=int, default=False)
+parser.add_argument('--checkpoint_name', type=str, default="")
 
 args = parser.parse_args()
 
-args.if_load_from_checkpoint = False
+# args.if_load_from_checkpoint = False
 # args.if_load_from_checkpoint = True
-# args.checkpoint_name = "1557667911"
+# args.checkpoint_name = "1569079093"
 
 
 ######################################################################################
@@ -82,7 +84,7 @@ def add_output(ss):
 
 def preparation():
     # set model save path
-    if args.if_load_from_checkpoint:
+    if args.load_from_checkpoint:
         timestamp = args.checkpoint_name
     else:
         timestamp = str(int(time.time()))
@@ -234,6 +236,8 @@ def eval_iters(ae_model, dis_model):
 
 
 if __name__ == '__main__':
+    print(args.load_from_checkpoint)
+    print(args.checkpoint_name)
     preparation()
 
     ae_model = get_cuda(make_model(d_vocab=args.vocab_size,
@@ -244,7 +248,7 @@ if __name__ == '__main__':
     ))
     dis_model = get_cuda(Classifier(latent_size=args.latent_size, output_size=args.label_size))
 
-    if args.if_load_from_checkpoint:
+    if args.load_from_checkpoint:
         # Load models' params from checkpoint
         ae_model.load_state_dict(torch.load(args.current_save_path + 'ae_model_params.pkl'))
         dis_model.load_state_dict(torch.load(args.current_save_path + 'dis_model_params.pkl'))
